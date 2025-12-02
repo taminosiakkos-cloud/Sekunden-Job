@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sekunden Job — Soforthilfe & Mikrojobs</title>
+  <meta name="description" content="Sekunden Job — Biete oder finde kurzfristige Hilfe: Umzug, Reinigung, Reparaturen, Gartenarbeit, Entrümpelung, Haushaltshilfe. Schnell, sicher, lokal." />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+  <div class="max-w-6xl mx-auto p-6">
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-extrabold tracking-tight">Sekunden <span class="text-indigo-600">Job</span></h1>
+        <p class="text-sm text-gray-500">Schnell helfen — schnell verdienen. Kurzfristige Hilfe in deiner Nähe.</p>
+      </div>
+      <nav class="space-x-3 text-sm">
+        <button id="tab-post" class="px-3 py-2 rounded bg-indigo-600 text-white">Auftrag erstellen</button>
+        <button id="tab-find" class="px-3 py-2 rounded bg-white border">Jobs finden</button>
+        <button id="tab-profile" class="px-3 py-2 rounded bg-white border">Profil (Suchender)</button>
+        <button id="tab-seekers" class="px-3 py-2 rounded bg-white border">Helfer finden</button>
+      </nav>
+    </header>
+
+    <!-- Main container -->
+    <main class="grid grid-cols-1 gap-6">
+
+      <!-- Post Job -->
+      <section id="panel-post" class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-3">Auftrag erstellen</h2>
+        <p class="text-sm text-gray-600 mb-4">Als Auftraggeber: Beschreibe den Einsatzort, Art des Einsatzes, Bezahlung und geschätzte Dauer. Dein Auftrag erscheint lokal und Suchende können sich direkt bewerben.</p>
+        <form id="form-post" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium">Titel</label>
+            <input required name="title" placeholder="z. B. Hilfe beim Umzug" class="mt-1 w-full border rounded px-3 py-2" />
+          </div>
+          <div>
+            <label class="text-sm font-medium">Kategorie</label>
+            <select required name="category" class="mt-1 w-full border rounded px-3 py-2">
+              <option value="Umzug">Umzug</option>
+              <option value="Reinigung">Reinigung</option>
+              <option value="Reparatur">Reparatur</option>
+              <option value="Garten">Gartenarbeit</option>
+              <option value="Entrümpelung">Entrümpelung</option>
+              <option value="Haushalt">Haushalt</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="text-sm font-medium">Beschreibung</label>
+            <textarea required name="description" rows="3" placeholder="Kurz beschreiben: Anzahl Helfer, Werkzeuge, Besonderheiten" class="mt-1 w-full border rounded px-3 py-2"></textarea>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Einsatzort (Ort/Bezirk)</label>
+            <input required name="location" placeholder="z. B. Graz-Lend" class="mt-1 w-full border rounded px-3 py-2" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Bezahlung (EUR, Fixpreis oder /h)</label>
+            <input required name="pay" placeholder="z. B. 50 oder 20/h" class="mt-1 w-full border rounded px-3 py-2" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Geschätzte Dauer</label>
+            <input required name="duration" placeholder="z. B. 2 Stunden" class="mt-1 w-full border rounded px-3 py-2" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Wann?</label>
+            <input type="datetime-local" name="when" class="mt-1 w-full border rounded px-3 py-2" />
+          </div>
+
+          <div class="sm:col-span-2 flex items-center gap-3">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Auftrag veröffentlichen</button>
+            <button type="button" id="clear-post" class="text-sm text-gray-600">Formular leeren</button>
+            <span id="post-msg" class="text-sm text-green-600"></span>
+          </div>
+        </form>
+
+        <hr class="my-4" />
+        <h3 class="font-medium mb-2">Veröffentlichte Aufträge (lokal)</h3>
+        <div id="jobs-list" class="space-y-3"></div>
+      </section>
+
+      <!-- Find Jobs -->
+      <section id="panel-find" class="bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="text-lg font-semibold mb-3">Jobs finden & bewerben</h2>
+        <p class="text-sm text-gray-600 mb-4">Als Auftragsuchender: Trage dein Einsatzgebiet und deine Fähigkeiten ein, suche passende Einsätze und bewirb dich direkt.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <input id="filter-location" placeholder="Ort/Bezirk (Filtern)" class="border rounded px-3 py-2" />
+          <select id="filter-category" class="border rounded px-3 py-2">
+            <option value="">Alle Kategorien</option>
+            <option>Umzug</option>
+            <option>Reinigung</option>
+            <option>Reparatur</option>
+            <option>Garten</option>
+            <option>Entrümpelung</option>
+            <option>Haushalt</option>
+          </select>
+          <button id="btn-filter" class="bg-indigo-600 text-white px-3 py-2 rounded">Suchen</button>
+        </div>
+
+        <div id="search-results" class="space-y-3"></div>
+      </section>
+
+      <!-- Profile -->
+      <section id="panel-profile" class="bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="text-lg font-semibold mb-3">Profil als Auftragsuchender</h2>
+        <p class="text-sm text-gray-600 mb-4">Erstelle ein kurzes Profil, damit Auftraggeber dich leichter finden und kontaktieren können.</p>
+        <form id="form-profile" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="text-sm font-medium">Name / Rufname</label>
+            <input name="name" placeholder="z. B. Tamino" class="mt-1 w-full border rounded px-3 py-2" required />
+          </div>
+          <div>
+            <label class="text-sm font-medium">Kontakt (Telefon oder E‑Mail)</label>
+            <input name="contact" placeholder="WhatsApp/Telefon oder E‑Mail" class="mt-1 w-full border rounded px-3 py-2" required />
+          </div>
+          <div>
+            <label class="text-sm font-medium">Einsatzgebiet (Orte/Radius)</label>
+            <input name="area" placeholder="z. B. Graz, 10 km" class="mt-1 w-full border rounded px-3 py-2" required />
+          </div>
+          <div>
+            <label class="text-sm font-medium">Verfügbare Zeiten</label>
+            <input name="times" placeholder="z. B. Mo–Fr ab 17 Uhr, Wochenende ganztags" class="mt-1 w-full border rounded px-3 py-2" required />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-sm font-medium">Fähigkeiten / Kategorien</label>
+            <div class="mt-1 flex gap-2 flex-wrap">
+              <label class="inline-flex items-center gap-2"><input type="checkbox" name="skills" value="Umzug"> Umzug</label>
+              <label class="inline-flex items-center gap-2"><input type="checkbox" name="skills" value="Reinigung"> Reinigung</label>
+              <label class="inline-flex items-center gap-2"><input type="checkbox" name="skills" value="Reparatur"> Reparatur</label>
+              <label class="inline-flex items-center gap-2"><input type="checkbox" name="skills" value="Garten"> Garten</label>
+              <label class="inline-flex items-center gap-2"><input type="checkbox" name="skills" value="Entrümpelung"> Entrümpelung</label>
+              <label class="inline-flex items-center gap-2"><input type="checkbox" name="skills" value="Haushalt"> Haushalt</label>
+            </div>
+          </div>
+
+          <div class="sm:col-span-2 flex items-center gap-3">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Profil speichern</button>
+            <button type="button" id="clear-profile" class="text-sm text-gray-600">Formular leeren</button>
+            <span id="profile-msg" class="text-sm text-green-600"></span>
+          </div>
+        </form>
+
+        <h3 class="font-medium mb-2">Gespeicherte Profile (öffentlich)</h3>
+        <div id="seekers-list" class="space-y-3"></div>
+      </section>
+
+      <!-- Seekers (for Auftraggeber browsing) -->
+      <section id="panel-seekers" class="bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="text-lg font-semibold mb-3">Helfer finden</h2>
+        <p class="text-sm text-gray-600 mb-4">Als Auftraggeber kannst du hier Profile anschauen und Helfer direkt kontaktieren.</p>
+        <div class="mb-4 flex gap-3">
+          <input id="seek-filter-area" placeholder="Ort/Radius" class="border rounded px-3 py-2" />
+          <select id="seek-filter-skill" class="border rounded px-3 py-2">
+            <option value="">Alle Fähigkeiten</option>
+            <option>Umzug</option>
+            <option>Reinigung</option>
+            <option>Reparatur</option>
+            <option>Garten</option>
+            <option>Entrümpelung</option>
+            <option>Haushalt</option>
+          </select>
+          <button id="btn-seek-filter" class="bg-indigo-600 text-white px-3 py-2 rounded">Filtern</button>
+        </div>
+        <div id="seek-results" class="space-y-3"></div>
+      </section>
+
+    </main>
+
+    <footer class="mt-8 text-center text-sm text-gray-500">© Sekunden Job — Minimal-Prototyp • Demo lokal (Daten im Browser gespeichert)</footer>
+  </div>
+
+  <script>
+    // Simple localStorage-based prototype data model
+    const STORAGE_KEYS = {
+      JOBS: 'sekunden_jobs_v1',
+      SEEKERS: 'sekunden_seekers_v1',
+      APPS: 'sekunden_apps_v1'
+    };
+
+    // Utility
+    const $ = (id) => document.getElementById(id);
+
+    function load(key) {
+      return JSON.parse(localStorage.getItem(key) || '[]');
+    }
+    function save(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // Tabs
+    const panels = {
+      post: $('panel-post'),
+      find: $('panel-find'),
+      profile: $('panel-profile'),
+      seekers: $('panel-seekers')
+    };
+    function showPanel(p) {
+      Object.values(panels).forEach(n => n.classList.add('hidden'));
+      panels[p].classList.remove('hidden');
+    }
+    $('tab-post').addEventListener('click', () => showPanel('post'));
+    $('tab-find').addEventListener('click', () => showPanel('find'));
+    $('tab-profile').addEventListener('click', () => showPanel('profile'));
+    $('tab-seekers').addEventListener('click', () => showPanel('seekers'));
+
+    // Render lists
+    function renderJobs() {
+      const jobs = load(STORAGE_KEYS.JOBS).slice().reverse();
+      const container = $('jobs-list');
+      container.innerHTML = jobs.length ? jobs.map(j => `
+        <div class="border rounded p-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-semibold">${escapeHtml(j.title)} <span class="text-xs text-gray-500">(${escapeHtml(j.category)})</span></h4>
+              <p class="text-sm text-gray-600">${escapeHtml(j.description)}</p>
+              <p class="text-xs text-gray-500 mt-2">Ort: ${escapeHtml(j.location)} • Bezahlung: ${escapeHtml(j.pay)} • Dauer: ${escapeHtml(j.duration)} • Wann: ${escapeHtml(j.when || 'sofort')}</p>
+            </div>
+            <div class="text-right text-sm">
+              <button class="apply-btn bg-indigo-600 text-white px-3 py-1 rounded" data-id="${j.id}">Bewerben</button>
+              <button class="delete-job text-xs text-red-500 ml-2" data-id="${j.id}">Löschen</button>
+            </div>
+          </div>
+        </div>
+      `).join('') : '<p class="text-sm text-gray-500">Noch keine Aufträge veröffentlicht.</p>';
+
+      // bind apply/delete
+      container.querySelectorAll('.apply-btn').forEach(btn => btn.addEventListener('click', onApplyClick));
+      container.querySelectorAll('.delete-job').forEach(btn => btn.addEventListener('click', onDeleteJob));
+    }
+
+    function renderSeekers() {
+      const seekers = load(STORAGE_KEYS.SEEKERS).slice().reverse();
+      const container = $('seekers-list');
+      container.innerHTML = seekers.length ? seekers.map(s => `
+        <div class="border rounded p-3">
+          <div class="flex justify-between">
+            <div>
+              <h4 class="font-semibold">${escapeHtml(s.name)} <span class="text-xs text-gray-500">${escapeHtml(s.area)}</span></h4>
+              <p class="text-sm text-gray-600">${escapeHtml(s.contact)} • Zeiten: ${escapeHtml(s.times)}</p>
+              <p class="text-sm text-gray-600 mt-2">Fähigkeiten: ${escapeHtml(s.skills.join(', '))}</p>
+            </div>
+            <div class="text-right">
+              <button class="contact-seeker bg-green-600 text-white px-3 py-1 rounded" data-id="${s.id}">Kontakt</button>
+            </div>
+          </div>
+        </div>
+      `).join('') : '<p class="text-sm text-gray-500">Noch keine Profile vorhanden.</p>';
+
+      container.querySelectorAll('.contact-seeker').forEach(b => b.addEventListener('click', (e)=>{
+        const id = e.target.dataset.id;
+        const s = load(STORAGE_KEYS.SEEKERS).find(x=>x.id===id);
+        if(s) alert(`Kontakt: ${s.contact}`);
+      }));
+    }
+
+    function renderSearchResults(filterLoc, filterCat) {
+      const jobs = load(STORAGE_KEYS.JOBS).slice().reverse();
+      const results = jobs.filter(j => {
+        const okLoc = !filterLoc || j.location.toLowerCase().includes(filterLoc.toLowerCase());
+        const okCat = !filterCat || j.category === filterCat;
+        return okLoc && okCat;
+      });
+      const container = $('search-results');
+      container.innerHTML = results.length ? results.map(j => `
+        <div class="border rounded p-3">
+          <h4 class="font-semibold">${escapeHtml(j.title)} <span class="text-xs text-gray-500">(${escapeHtml(j.category)})</span></h4>
+          <p class="text-sm text-gray-600">${escapeHtml(j.description)}</p>
+          <p class="text-xs text-gray-500 mt-2">Ort: ${escapeHtml(j.location)} • Bezahlung: ${escapeHtml(j.pay)} • Dauer: ${escapeHtml(j.duration)}</p>
+          <div class="mt-2 text-right"><button class="apply-btn bg-indigo-600 text-white px-3 py-1 rounded" data-id="${j.id}">Bewerben</button></div>
+        </div>
+      `).join('') : '<p class="text-sm text-gray-500">Keine passenden Einsätze gefunden.</p>';
+
+      container.querySelectorAll('.apply-btn').forEach(btn => btn.addEventListener('click', onApplyClick));
+    }
+
+    function renderSeekResultsFilter(area, skill) {
+      const seekers = load(STORAGE_KEYS.SEEKERS).slice().reverse();
+      const results = seekers.filter(s => {
+        const okArea = !area || s.area.toLowerCase().includes(area.toLowerCase());
+        const okSkill = !skill || s.skills.includes(skill);
+        return okArea && okSkill;
+      });
+      const container = $('seek-results');
+      container.innerHTML = results.length ? results.map(s => `
+        <div class="border rounded p-3">
+          <h4 class="font-semibold">${escapeHtml(s.name)} <span class="text-xs text-gray-500">${escapeHtml(s.area)}</span></h4>
+          <p class="text-sm text-gray-600">${escapeHtml(s.contact)} • Zeiten: ${escapeHtml(s.times)}</p>
+          <p class="text-sm text-gray-600 mt-2">Fähigkeiten: ${escapeHtml(s.skills.join(', '))}</p>
+        </div>
+      `).join('') : '<p class="text-sm text-gray-500">Keine Helfer gefunden.</p>';
+    }
+
+    // Form handlers
+    $('form-post').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const job = {
+        id: 'job_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+        title: f.get('title'),
+        category: f.get('category'),
+        description: f.get('description'),
+        location: f.get('location'),
+        pay: f.get('pay'),
+        duration: f.get('duration'),
+        when: f.get('when')
+      };
+      const jobs = load(STORAGE_KEYS.JOBS);
+      jobs.push(job);
+      save(STORAGE_KEYS.JOBS, jobs);
+      $('post-msg').textContent = 'Auftrag veröffentlicht.';
+      setTimeout(()=> $('post-msg').textContent = '', 2500);
+      e.target.reset();
+      renderJobs();
+    });
+
+    $('clear-post').addEventListener('click', ()=> $('form-post').reset());
+
+    $('btn-filter').addEventListener('click', ()=>{
+      const loc = $('filter-location').value.trim();
+      const cat = $('filter-category').value;
+      renderSearchResults(loc, cat);
+      showPanel('find');
+    });
+
+    // Profile
+    $('form-profile').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const skills = [];
+      e.target.querySelectorAll('input[name="skills"]:checked').forEach(c => skills.push(c.value));
+      const seeker = {
+        id: 'sk_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+        name: f.get('name'),
+        contact: f.get('contact'),
+        area: f.get('area'),
+        times: f.get('times'),
+        skills
+      };
+      const seekers = load(STORAGE_KEYS.SEEKERS);
+      seekers.push(seeker);
+      save(STORAGE_KEYS.SEEKERS, seekers);
+      $('profile-msg').textContent = 'Profil gespeichert.';
+      setTimeout(()=> $('profile-msg').textContent = '', 2500);
+      e.target.reset();
+      renderSeekers();
+    });
+
+    $('clear-profile').addEventListener('click', ()=> $('form-profile').reset());
+
+    // Apply / contact
+    function onApplyClick(e) {
+      const id = e.target.dataset.id;
+      const seekers = load(STORAGE_KEYS.SEEKERS);
+      if(!seekers.length) {
+        if(!confirm('Du hast noch kein Profil angelegt. Profil jetzt anlegen?')) {
+          alert('Lege dein Profil an, damit Auftraggeber dich kontaktieren können.');
+          return;
+        } else {
+          showPanel('profile');
+          return;
+        }
+      }
+      // Simple modal: choose a seeker (if multiple) or show contact
+      const seeker = seekers[seekers.length-1]; // last saved profile as default
+      const jobs = load(STORAGE_KEYS.JOBS);
+      const job = jobs.find(j=>j.id === id);
+      if(!job) return alert('Auftrag nicht gefunden.');
+      // save application
+      const apps = load(STORAGE_KEYS.APPS);
+      apps.push({id: 'app_' + Date.now(), jobId: job.id, seekerId: seeker.id, when: new Date().toISOString()});
+      save(STORAGE_KEYS.APPS, apps);
+      alert(`Bewerbung gesendet! Kontakt des gewünschten Profils: ${seeker.contact}\nBitte erwarte Kontakt vom Auftraggeber.`);
+    }
+
+    function onDeleteJob(e) {
+      const id = e.target.dataset.id;
+      if(!confirm('Auftrag wirklich löschen?')) return;
+      let jobs = load(STORAGE_KEYS.JOBS);
+      jobs = jobs.filter(j=>j.id !== id);
+      save(STORAGE_KEYS.JOBS, jobs);
+      renderJobs();
+    }
+
+    // Seekers filter
+    $('btn-seek-filter')?.addEventListener('click', ()=>{
+      const area = $('seek-filter-area').value.trim();
+      const skill = $('seek-filter-skill').value;
+      renderSeekResultsFilter(area, skill);
+      showPanel('seekers');
+    });
+
+    // Initial render
+    renderJobs();
+    renderSeekers();
+
+    // Helpers
+    function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]; }); }
+
+    // Small UX: allow export/import data
+    window.addEventListener('keydown', (e)=>{
+      if(e.ctrlKey && e.key === 'e') {
+        const data = {jobs: load(STORAGE_KEYS.JOBS), seekers: load(STORAGE_KEYS.SEEKERS), apps: load(STORAGE_KEYS.APPS)};
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'sekundenjob-data.json'; a.click();
+      }
+      if(e.ctrlKey && e.key === 'i') {
+        const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json';
+        inp.onchange = ()=>{
+          const f = inp.files[0]; if(!f) return; const r = new FileReader(); r.onload = ()=>{
+            try{ const d = JSON.parse(r.result); save(STORAGE_KEYS.JOBS, d.jobs||[]); save(STORAGE_KEYS.SEEKERS, d.seekers||[]); save(STORAGE_KEYS.APPS, d.apps||[]); renderJobs(); renderSeekers(); alert('Import erfolgreich'); }catch(err){ alert('Fehler beim Import'); }
+          }; r.readAsText(f);
+        }; inp.click();
+      }
+    });
+
+  </script>
+</body>
+</html>
